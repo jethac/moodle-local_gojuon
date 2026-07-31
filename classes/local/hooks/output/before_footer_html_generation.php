@@ -64,10 +64,6 @@ class before_footer_html_generation {
                 return;
             }
 
-            if (get_config('local_gojuon', 'hidelatin')) {
-                $PAGE->add_body_class('local-gojuon-hidelatin');
-            }
-
             // Chips in display order: all, kana rows, Latin A–Z, other.
             $chips = [['key' => kana::ALL, 'label' => get_string('all', 'local_gojuon')]];
             foreach (kana::rows() as $key => $row) {
@@ -108,8 +104,11 @@ class before_footer_html_generation {
                 'bars' => $bars,
             ]));
 
+            // The hidelatin body class is applied by the module at runtime:
+            // add_body_class() cannot run this late (the body tag is out).
             $PAGE->requires->js_call_amd('local_gojuon/gojuon', 'init', [[
                 'tablecomponent' => 'local_gojuon',
+                'hidelatin' => (bool) get_config('local_gojuon', 'hidelatin'),
             ]]);
         } catch (\Throwable $e) {
             debugging('local_gojuon: ' . $e->getMessage(), DEBUG_DEVELOPER);

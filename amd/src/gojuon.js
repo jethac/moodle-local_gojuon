@@ -119,6 +119,11 @@ const handleChip = (btn, config) => {
 export const init = (config) => {
     const bar = document.querySelector(SELECTORS.bar);
     try {
+        // Applied here rather than via PHP add_body_class(), which cannot
+        // run in the footer hook after the body tag is already emitted.
+        if (config.hidelatin) {
+            document.body.classList.add('local-gojuon-hidelatin');
+        }
         if (!bar) {
             return;
         }
