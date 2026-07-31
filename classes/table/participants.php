@@ -48,11 +48,13 @@ class participants extends \core_user\table\participants {
             return [$where, $params];
         }
 
-        $u = 'u.';
-        $surname = $DB->sql_substr("COALESCE(NULLIF({$u}lastnamephonetic, ''), {$u}firstnamephonetic)", 1, 1);
+        // NOTE: this WHERE is injected into a subquery whose only table is
+        // {user} (aliased udistinct), so columns must be unqualified — the
+        // same convention core's initials-bar conditions rely on.
+        $surname = $DB->sql_substr("COALESCE(NULLIF(lastnamephonetic, ''), firstnamephonetic)", 1, 1);
 
         if ($row === kana::OTHER) {
-            $cond = "(COALESCE({$u}lastnamephonetic, '') = '' AND COALESCE({$u}firstnamephonetic, '') = '')";
+            $cond = "(COALESCE(lastnamephonetic, '') = '' AND COALESCE(firstnamephonetic, '') = '')";
             $cparams = [];
         } else if (isset(kana::ROWS[$row])) {
             [$insql, $cparams] = $DB->get_in_or_equal(kana::ROWS[$row]['chars'], SQL_PARAMS_NAMED, 'gojuon');
