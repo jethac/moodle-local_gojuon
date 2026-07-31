@@ -47,7 +47,7 @@ class before_footer_html_generation {
         }
 
         $rows = [];
-        foreach (kana::ROWS as $key => $row) {
+        foreach (kana::rows() as $key => $row) {
             $rows[] = ['key' => $key, 'label' => $row['label']];
         }
         $config = [

@@ -74,11 +74,12 @@ class participants extends \core_user\table\participants {
         if ($row === kana::OTHER) {
             return ["(COALESCE($column, '') = '')", []];
         }
-        if (!isset(kana::ROWS[$row])) {
+        $rows = kana::rows();
+        if (!isset($rows[$row])) {
             return [null, []];
         }
         $initial = $DB->sql_substr($column, 1, 1);
-        [$insql, $params] = $DB->get_in_or_equal(kana::ROWS[$row]['chars'], SQL_PARAMS_NAMED, 'gojuon' . $column);
+        [$insql, $params] = $DB->get_in_or_equal($rows[$row]['chars'], SQL_PARAMS_NAMED, 'gojuon' . $column);
         return ["($initial $insql)", $params];
     }
 

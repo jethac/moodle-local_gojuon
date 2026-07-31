@@ -47,4 +47,31 @@ class kana {
 
     /** Row key reserved for users with no phonetic surname. */
     const OTHER = 'other';
+
+    /**
+     * All index rows: the gojūon rows followed by Latin letters A–Z
+     * (keys la–lz), each Latin row matching upper, lower, and full-width
+     * (Ａ/ａ) leading characters — for romaji readings and mixed rosters.
+     *
+     * @return array<string, array{label: string, chars: string[]}>
+     */
+    public static function rows(): array {
+        static $rows = null;
+        if ($rows === null) {
+            $rows = self::ROWS;
+            foreach (range('A', 'Z') as $letter) {
+                $lower = strtolower($letter);
+                $rows['l' . $lower] = [
+                    'label' => $letter,
+                    'chars' => [
+                        $letter,
+                        $lower,
+                        mb_chr(0xFF21 + ord($letter) - ord('A'), 'UTF-8'),
+                        mb_chr(0xFF41 + ord($letter) - ord('A'), 'UTF-8'),
+                    ],
+                ];
+            }
+        }
+        return $rows;
+    }
 }
