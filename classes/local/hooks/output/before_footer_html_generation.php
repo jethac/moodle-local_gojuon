@@ -55,6 +55,10 @@ class before_footer_html_generation {
             'other' => ['key' => kana::OTHER, 'label' => get_string('other', 'local_gojuon')],
             'all' => ['key' => 'all', 'label' => get_string('all', 'local_gojuon')],
             'arialabel' => get_string('barlabel', 'local_gojuon'),
+            'bars' => [
+                ['filter' => 'kanalast', 'label' => get_string('familyname', 'local_gojuon')],
+                ['filter' => 'kanafirst', 'label' => get_string('givenname', 'local_gojuon')],
+            ],
         ];
 
         $html = '';
@@ -83,31 +87,44 @@ class before_footer_html_generation {
     // Re-point the dynamic table at the gojuon-aware subclass.
     root.dataset.tableComponent = 'local_gojuon';
 
-    var bar = document.createElement('nav');
-    bar.id = 'local-gojuon-bar';
-    bar.className = 'mb-3 d-flex flex-wrap';
-    bar.style.gap = '4px';
-    bar.setAttribute('aria-label', cfg.arialabel);
+    var wrap = document.createElement('div');
+    wrap.id = 'local-gojuon-bar';
+    wrap.className = 'mb-3';
+    wrap.setAttribute('role', 'navigation');
+    wrap.setAttribute('aria-label', cfg.arialabel);
 
     var chips = [cfg.all].concat(cfg.rows, [cfg.other]);
-    chips.forEach(function(chip) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'btn btn-secondary btn-sm local-gojuon-chip';
-        b.dataset.row = chip.key;
-        b.textContent = chip.label;
-        if (chip.key === 'all') {
-            b.classList.add('active');
-            b.setAttribute('aria-pressed', 'true');
-        }
-        bar.appendChild(b);
+    cfg.bars.forEach(function(barcfg) {
+        var barrow = document.createElement('div');
+        barrow.className = 'd-flex flex-wrap align-items-center mb-1';
+        barrow.style.gap = '4px';
+        barrow.dataset.filter = barcfg.filter;
+        var lab = document.createElement('span');
+        lab.className = 'me-2 text-muted';
+        lab.textContent = barcfg.label;
+        barrow.appendChild(lab);
+        chips.forEach(function(chip) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'btn btn-secondary btn-sm local-gojuon-chip';
+            b.dataset.row = chip.key;
+            b.dataset.filter = barcfg.filter;
+            b.textContent = chip.label;
+            if (chip.key === 'all') {
+                b.classList.add('active');
+                b.setAttribute('aria-pressed', 'true');
+            }
+            barrow.appendChild(b);
+        });
+        wrap.appendChild(barrow);
     });
-    root.insertAdjacentElement('beforebegin', bar);
+    root.insertAdjacentElement('beforebegin', wrap);
 
-    bar.addEventListener('click', function(e) {
+    wrap.addEventListener('click', function(e) {
         var btn = e.target.closest('.local-gojuon-chip');
         if (!btn) { return; }
         var row = btn.dataset.row;
+        var filtername = btn.dataset.filter;
         require(['core_table/dynamic'], function(Dynamic) {
             var current = findRoot();
             if (!current) { return; }
@@ -115,12 +132,12 @@ class before_footer_html_generation {
             var filters = Dynamic.getFilters(current);
             filters.filters = filters.filters || {};
             if (row === 'all') {
-                delete filters.filters.kanarow;
+                delete filters.filters[filtername];
             } else {
-                filters.filters.kanarow = {name: 'kanarow', jointype: 1, values: [row]};
+                filters.filters[filtername] = {name: filtername, jointype: 1, values: [row]};
             }
             Dynamic.setFilters(current, filters).then(function() {
-                bar.querySelectorAll('.local-gojuon-chip').forEach(function(c) {
+                wrap.querySelectorAll('.local-gojuon-chip[data-filter="' + filtername + '"]').forEach(function(c) {
                     var on = c.dataset.row === row;
                     c.classList.toggle('active', on);
                     c.setAttribute('aria-pressed', on ? 'true' : 'false');

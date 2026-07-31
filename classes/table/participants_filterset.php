@@ -28,13 +28,14 @@ use core_table\local\filter\string_filter;
 class participants_filterset extends \core_user\table\participants_filterset {
 
     /**
-     * Optional filters: everything core allows, plus `kanarow`.
+     * Optional filters: everything core allows, plus the two kana axes.
      *
      * @return array
      */
     public function get_optional_filters(): array {
         $filters = parent::get_optional_filters();
-        $filters['kanarow'] = string_filter::class;
+        $filters['kanalast'] = string_filter::class;
+        $filters['kanafirst'] = string_filter::class;
         return $filters;
     }
 }

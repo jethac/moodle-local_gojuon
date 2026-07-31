@@ -40,43 +40,59 @@ class participants extends \core_user\table\participants {
      * @return array [$where, $params]
      */
     public function get_sql_where() {
-        global $DB;
         [$where, $params] = parent::get_sql_where();
 
-        $row = $this->get_kanarow();
-        if ($row === null) {
-            return [$where, $params];
+        // Two independent axes, mirroring core's last/first initials bars.
+        foreach (['kanalast' => 'lastnamephonetic', 'kanafirst' => 'firstnamephonetic'] as $filter => $column) {
+            $row = $this->get_kanarow($filter);
+            if ($row === null) {
+                continue;
+            }
+            [$cond, $cparams] = $this->kana_condition($column, $row);
+            if ($cond === null) {
+                continue;
+            }
+            $where = $where !== '' ? "($where) AND $cond" : $cond;
+            $params = array_merge($params, $cparams);
         }
-
-        // NOTE: this WHERE is injected into a subquery whose only table is
-        // {user} (aliased udistinct), so columns must be unqualified — the
-        // same convention core's initials-bar conditions rely on.
-        $surname = $DB->sql_substr("COALESCE(NULLIF(lastnamephonetic, ''), firstnamephonetic)", 1, 1);
-
-        if ($row === kana::OTHER) {
-            $cond = "(COALESCE(lastnamephonetic, '') = '' AND COALESCE(firstnamephonetic, '') = '')";
-            $cparams = [];
-        } else if (isset(kana::ROWS[$row])) {
-            [$insql, $cparams] = $DB->get_in_or_equal(kana::ROWS[$row]['chars'], SQL_PARAMS_NAMED, 'gojuon');
-            $cond = "($surname $insql)";
-        } else {
-            return [$where, $params];
-        }
-
-        $where = $where !== '' ? "($where) AND $cond" : $cond;
-        return [$where, array_merge($params, $cparams)];
+        return [$where, $params];
     }
 
     /**
-     * Read the kanarow filter value from the filterset, if present.
+     * Build the SQL condition for one kana row against one phonetic column.
      *
+     * NOTE: this WHERE is injected into a subquery whose only table is
+     * {user} (aliased udistinct), so columns must be unqualified — the
+     * same convention core's initials-bar conditions rely on.
+     *
+     * @param string $column lastnamephonetic or firstnamephonetic
+     * @param string $row row key from kana::ROWS, or kana::OTHER
+     * @return array [?string $condition, array $params]
+     */
+    protected function kana_condition(string $column, string $row): array {
+        global $DB;
+        if ($row === kana::OTHER) {
+            return ["(COALESCE($column, '') = '')", []];
+        }
+        if (!isset(kana::ROWS[$row])) {
+            return [null, []];
+        }
+        $initial = $DB->sql_substr($column, 1, 1);
+        [$insql, $params] = $DB->get_in_or_equal(kana::ROWS[$row]['chars'], SQL_PARAMS_NAMED, 'gojuon' . $column);
+        return ["($initial $insql)", $params];
+    }
+
+    /**
+     * Read a kana filter value from the filterset, if present.
+     *
+     * @param string $filtername kanalast or kanafirst
      * @return string|null
      */
-    protected function get_kanarow(): ?string {
-        if (!$this->filterset || !$this->filterset->has_filter('kanarow')) {
+    protected function get_kanarow(string $filtername): ?string {
+        if (!$this->filterset || !$this->filterset->has_filter($filtername)) {
             return null;
         }
-        $values = $this->filterset->get_filter('kanarow')->get_filter_values();
+        $values = $this->filterset->get_filter($filtername)->get_filter_values();
         if (empty($values)) {
             return null;
         }

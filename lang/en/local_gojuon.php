@@ -29,3 +29,5 @@ $string['other'] = '他';
 $string['hidelatin'] = 'Hide A–Z initials bars';
 $string['hidelatin_desc'] = 'Hide the Latin first/last-name initials bars on the participants page, leaving the gojūon index as the only letter navigation.';
 $string['privacy:metadata'] = 'The Gojūon participants index plugin does not store any personal data.';
+$string['familyname'] = 'Family name';
+$string['givenname'] = 'Given name';
