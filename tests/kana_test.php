@@ -33,9 +33,13 @@ final class kana_test extends \advanced_testcase {
     public function test_rows_are_pairwise_disjoint(): void {
         $seen = [];
         foreach (kana::rows() as $key => $row) {
+            // Each row's own set must already be duplicate-free.
+            $this->assertSame(array_values($row['chars']), array_values(array_unique($row['chars'])),
+                "Row '$key' has duplicate characters.");
             foreach ($row['chars'] as $char) {
-                $this->assertArrayNotHasKey($char, $seen,
-                    "Character '$char' is in both '{$seen[$char]}' and '$key' rows.");
+                if (isset($seen[$char])) {
+                    $this->fail("Character '$char' is in both '{$seen[$char]}' and '$key' rows.");
+                }
                 $seen[$char] = $key;
             }
         }
