@@ -19,7 +19,11 @@ namespace local_gojuon\table;
 use core_table\local\filter\string_filter;
 
 /**
- * Participants filterset extended with the optional gojūon row filter.
+ * Participants filterset extended with the optional gojūon row filters.
+ *
+ * When the plugin is disabled the kana filters are omitted here, so core's
+ * add_filter_from_params() rejects them at the webservice boundary — the
+ * filter surface is genuinely gone, not merely ignored downstream.
  *
  * @package   local_gojuon
  * @copyright 2026 Jetha Chan
@@ -28,14 +32,17 @@ use core_table\local\filter\string_filter;
 class participants_filterset extends \core_user\table\participants_filterset {
 
     /**
-     * Optional filters: everything core allows, plus the two kana axes.
+     * Optional filters: everything core allows, plus the two kana axes
+     * (unless the plugin is disabled).
      *
      * @return array
      */
     public function get_optional_filters(): array {
         $filters = parent::get_optional_filters();
-        $filters['kanalast'] = string_filter::class;
-        $filters['kanafirst'] = string_filter::class;
+        if (get_config('local_gojuon', 'enabled')) {
+            $filters['kanalast'] = string_filter::class;
+            $filters['kanafirst'] = string_filter::class;
+        }
         return $filters;
     }
 }

@@ -29,3 +29,5 @@ $string['other'] = '他';
 $string['hidelatin'] = 'A–Zバーを非表示';
 $string['hidelatin_desc'] = '参加者ページのアルファベット（A–Z）バーを非表示にし、五十音インデックスのみを表示します。';
 $string['privacy:metadata'] = '五十音参加者インデックスプラグインは個人データを保存しません。';
+$string['enabled'] = 'かなフィルタを有効化';
+$string['enabled_desc'] = 'オフにすると、かなバーが消え、参加者ウェブサービスで kanalast/kanafirst フィルタが拒否されます（単に非表示ではなく完全に無効化）。';

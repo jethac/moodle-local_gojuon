@@ -17,9 +17,15 @@
 namespace local_gojuon\local\hooks\output;
 
 use local_gojuon\kana;
+use local_gojuon\phonetic;
+use local_gojuon\table\participants;
 
 /**
  * Injects the gojūon index bar onto the course participants page.
+ *
+ * The bar markup is rendered from a Mustache template and the behaviour is
+ * an AMD module — no inline JavaScript or CSS — so the plugin honours the
+ * Moodle output guidelines and strict-CSP sites.
  *
  * @package   local_gojuon
  * @copyright 2026 Jetha Chan
@@ -28,130 +34,98 @@ use local_gojuon\kana;
 class before_footer_html_generation {
 
     /**
-     * Add the bar markup + driver script when we're on user/index.php.
+     * Add the bar + module when we're on the course participants page and
+     * the viewer may see at least one phonetic name field.
+     *
+     * The whole body is guarded: a cosmetic index bar must never break the
+     * participants page, so any failure degrades to no bar.
      *
      * @param \core\hook\output\before_footer_html_generation $hook
      */
     public static function callback(\core\hook\output\before_footer_html_generation $hook): void {
-        global $PAGE;
+        global $PAGE, $OUTPUT;
 
         try {
-            if (!$PAGE->has_set_url()) {
+            // Never emit during the dynamic-table webservice, AJAX, or CLI.
+            if (AJAX_SCRIPT || CLI_SCRIPT || (defined('WS_SERVER') && WS_SERVER)) {
                 return;
             }
-            if (strpos($PAGE->url->get_path(), '/user/index.php') === false) {
+            if (!get_config('local_gojuon', 'enabled')) {
                 return;
             }
+            if (!self::is_participants_page()) {
+                return;
+            }
+            $context = $PAGE->context;
+            if (!$context instanceof \context_course) {
+                return;
+            }
+            if (!phonetic::viewer_can_see($context)) {
+                return;
+            }
+
+            if (get_config('local_gojuon', 'hidelatin')) {
+                $PAGE->add_body_class('local-gojuon-hidelatin');
+            }
+
+            // Chips in display order: all, kana rows, Latin A–Z, other.
+            $chips = [['key' => kana::ALL, 'label' => get_string('all', 'local_gojuon')]];
+            foreach (kana::rows() as $key => $row) {
+                $chips[] = ['key' => $key, 'label' => $row['label']];
+            }
+            $chips[] = ['key' => kana::OTHER, 'label' => get_string('other', 'local_gojuon')];
+
+            // One bar per visible axis. aria-pressed carries string booleans
+            // so the server-rendered initial ARIA state is valid.
+            $bars = [];
+            foreach (participants::AXES as $filter => $column) {
+                if (!phonetic::viewer_can_see_field($context, $column)) {
+                    continue;
+                }
+                $barchips = [];
+                foreach ($chips as $chip) {
+                    $isall = $chip['key'] === kana::ALL;
+                    $barchips[] = [
+                        'key' => $chip['key'],
+                        'label' => $chip['label'],
+                        'filter' => $filter,
+                        'active' => $isall,
+                        'ariapressed' => $isall ? 'true' : 'false',
+                    ];
+                }
+                $bars[] = [
+                    'filter' => $filter,
+                    'label' => $filter === 'kanalast' ? get_string('lastname') : get_string('firstname'),
+                    'chips' => $barchips,
+                ];
+            }
+            if (empty($bars)) {
+                return;
+            }
+
+            $hook->add_html($OUTPUT->render_from_template('local_gojuon/bar', [
+                'arialabel' => get_string('barlabel', 'local_gojuon'),
+                'bars' => $bars,
+            ]));
+
+            $PAGE->requires->js_call_amd('local_gojuon/gojuon', 'init', [[
+                'tablecomponent' => 'local_gojuon',
+            ]]);
         } catch (\Throwable $e) {
-            return;
+            debugging('local_gojuon: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
+    }
 
-        $rows = [];
-        foreach (kana::rows() as $key => $row) {
-            $rows[] = ['key' => $key, 'label' => $row['label']];
+    /**
+     * Whether the current page is the course participants list.
+     *
+     * @return bool
+     */
+    protected static function is_participants_page(): bool {
+        global $PAGE;
+        if (!$PAGE->has_set_url()) {
+            return false;
         }
-        $config = [
-            'rows' => $rows,
-            'other' => ['key' => kana::OTHER, 'label' => get_string('other', 'local_gojuon')],
-            'all' => ['key' => 'all', 'label' => get_string('all', 'local_gojuon')],
-            'arialabel' => get_string('barlabel', 'local_gojuon'),
-            'bars' => [
-                // Core's own strings, so the labels always match the
-                // participants column headers in the viewer's language.
-                ['filter' => 'kanalast', 'label' => get_string('lastname')],
-                ['filter' => 'kanafirst', 'label' => get_string('firstname')],
-            ],
-        ];
-
-        $html = '';
-        if (get_config('local_gojuon', 'hidelatin')) {
-            $html .= '<style>.initialbar, .initialbars { display: none !important; }</style>';
-        }
-
-        $html .= \html_writer::div('', '', [
-            'id' => 'local-gojuon-config',
-            'data-config' => json_encode($config),
-            'hidden' => 'hidden',
-        ]);
-
-        $html .= <<<'JS'
-<script>
-(function() {
-    var cfgel = document.getElementById('local-gojuon-config');
-    if (!cfgel) { return; }
-    var cfg = JSON.parse(cfgel.dataset.config);
-    var findRoot = function() {
-        return document.querySelector('[data-table-component][data-table-handler="participants"]');
-    };
-    var root = findRoot();
-    if (!root) { return; }
-
-    // Re-point the dynamic table at the gojuon-aware subclass.
-    root.dataset.tableComponent = 'local_gojuon';
-
-    var wrap = document.createElement('div');
-    wrap.id = 'local-gojuon-bar';
-    wrap.className = 'mb-3';
-    wrap.setAttribute('role', 'navigation');
-    wrap.setAttribute('aria-label', cfg.arialabel);
-
-    var chips = [cfg.all].concat(cfg.rows, [cfg.other]);
-    cfg.bars.forEach(function(barcfg) {
-        var barrow = document.createElement('div');
-        barrow.className = 'd-flex flex-wrap align-items-center mb-1';
-        barrow.style.gap = '4px';
-        barrow.dataset.filter = barcfg.filter;
-        var lab = document.createElement('span');
-        lab.className = 'me-2 text-muted';
-        lab.textContent = barcfg.label;
-        barrow.appendChild(lab);
-        chips.forEach(function(chip) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'btn btn-secondary btn-sm local-gojuon-chip';
-            b.dataset.row = chip.key;
-            b.dataset.filter = barcfg.filter;
-            b.textContent = chip.label;
-            if (chip.key === 'all') {
-                b.classList.add('active');
-                b.setAttribute('aria-pressed', 'true');
-            }
-            barrow.appendChild(b);
-        });
-        wrap.appendChild(barrow);
-    });
-    root.insertAdjacentElement('beforebegin', wrap);
-
-    wrap.addEventListener('click', function(e) {
-        var btn = e.target.closest('.local-gojuon-chip');
-        if (!btn) { return; }
-        var row = btn.dataset.row;
-        var filtername = btn.dataset.filter;
-        require(['core_table/dynamic'], function(Dynamic) {
-            var current = findRoot();
-            if (!current) { return; }
-            current.dataset.tableComponent = 'local_gojuon';
-            var filters = Dynamic.getFilters(current);
-            filters.filters = filters.filters || {};
-            if (row === 'all') {
-                delete filters.filters[filtername];
-            } else {
-                filters.filters[filtername] = {name: filtername, jointype: 1, values: [row]};
-            }
-            Dynamic.setFilters(current, filters).then(function() {
-                wrap.querySelectorAll('.local-gojuon-chip[data-filter="' + filtername + '"]').forEach(function(c) {
-                    var on = c.dataset.row === row;
-                    c.classList.toggle('active', on);
-                    c.setAttribute('aria-pressed', on ? 'true' : 'false');
-                });
-                return null;
-            }).catch(function() { return null; });
-        });
-    });
-})();
-</script>
-JS;
-
-        $hook->add_html($html);
+        return $PAGE->url->compare(new \moodle_url('/user/index.php'), URL_MATCH_BASE);
     }
 }

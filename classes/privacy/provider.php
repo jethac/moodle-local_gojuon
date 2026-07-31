@@ -14,25 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_gojuon\privacy;
+
 /**
- * Admin settings for local_gojuon.
+ * Privacy provider — the plugin stores no personal data.
  *
  * @package   local_gojuon
  * @copyright 2026 Jetha Chan
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class provider implements \core_privacy\local\metadata\null_provider {
 
-defined('MOODLE_INTERNAL') || die();
-
-if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_gojuon', get_string('pluginname', 'local_gojuon'));
-    $ADMIN->add('localplugins', $settings);
-
-    $settings->add(new admin_setting_configcheckbox('local_gojuon/enabled',
-        get_string('enabled', 'local_gojuon'),
-        get_string('enabled_desc', 'local_gojuon'), 1));
-
-    $settings->add(new admin_setting_configcheckbox('local_gojuon/hidelatin',
-        get_string('hidelatin', 'local_gojuon'),
-        get_string('hidelatin_desc', 'local_gojuon'), 0));
+    /**
+     * Reason this plugin stores no personal data.
+     *
+     * @return string language string identifier
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
 }
