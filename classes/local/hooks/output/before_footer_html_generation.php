@@ -56,8 +56,10 @@ class before_footer_html_generation {
             'all' => ['key' => 'all', 'label' => get_string('all', 'local_gojuon')],
             'arialabel' => get_string('barlabel', 'local_gojuon'),
             'bars' => [
-                ['filter' => 'kanalast', 'label' => get_string('familyname', 'local_gojuon')],
-                ['filter' => 'kanafirst', 'label' => get_string('givenname', 'local_gojuon')],
+                // Core's own strings, so the labels always match the
+                // participants column headers in the viewer's language.
+                ['filter' => 'kanalast', 'label' => get_string('lastname')],
+                ['filter' => 'kanafirst', 'label' => get_string('firstname')],
             ],
         ];
 

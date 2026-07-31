@@ -29,5 +29,3 @@ $string['other'] = '他';
 $string['hidelatin'] = 'A–Zバーを非表示';
 $string['hidelatin_desc'] = '参加者ページのアルファベット（A–Z）バーを非表示にし、五十音インデックスのみを表示します。';
 $string['privacy:metadata'] = '五十音参加者インデックスプラグインは個人データを保存しません。';
-$string['familyname'] = '姓';
-$string['givenname'] = '名';
