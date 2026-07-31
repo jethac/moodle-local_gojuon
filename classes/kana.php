@@ -76,17 +76,27 @@ class kana {
             return $rows;
         }
         $rows = [];
+        $claimed = []; // Every character already assigned to a row.
+        foreach (self::BASE_ROWS as $key => $row) {
+            foreach ($row['chars'] as $ch) {
+                $claimed[$ch] = true;
+            }
+        }
         foreach (self::BASE_ROWS as $key => $row) {
             $chars = $row['chars'];
             foreach ($row['chars'] as $ch) {
                 // Fold full-width katakana to its half-width lead so that
                 // ｻﾄｳ-style imported readings bucket alongside サトウ. Voiced
                 // half-width kana (ｶﾞ) is two codepoints; the leading base
-                // (ｶ) is what SUBSTR(col, 1, 1) sees, which is what we want.
+                // (ｶ) is what the prefix match sees, which is what we want.
+                // Skip a lead already claimed by another row: archaic kana
+                // (ヰ) have no true half-width form and PHP approximates them
+                // onto a modern lead (ｲ) that belongs elsewhere.
                 $half = mb_convert_kana($ch, 'k', 'UTF-8');
                 $lead = mb_substr($half, 0, 1, 'UTF-8');
-                if ($lead !== '' && $lead !== $ch) {
+                if ($lead !== '' && $lead !== $ch && empty($claimed[$lead])) {
                     $chars[] = $lead;
+                    $claimed[$lead] = true;
                 }
             }
             $row['chars'] = array_values(array_unique($chars));
