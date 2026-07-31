@@ -23,3 +23,10 @@ php admin/cli/purge_caches.php
 Setting: Site administration → Plugins → Local plugins → Gojūon participants index → *Hide A–Z initials bars*.
 
 Pairs nicely with [theme_lozenge](https://github.com/jethac/moodle-theme_lozenge). GPLv3, like Moodle.
+
+## Security & scope notes
+
+- **Filter visibility gate.** The kana filters and the bar are shown only for a phonetic field the viewer may actually read (present in the name format that applies to them). This prevents using the filter as an oracle to binary-search a hidden reading. Note that core's own `keywords` participants filter runs an *ungated* `LIKE '%…%'` over the same two phonetic columns, so this plugin is at parity with core, and stricter by default.
+- **Collation.** Matching is a case- and accent-sensitive prefix `LIKE`, so voiced kana never conflate with their base (が ≠ か) regardless of the site's default collation, and the predicate is index-usable.
+- **Completeness.** 他 is the true complement (empty reading, or a leading character in no row), so every participant lands in exactly one bucket — nobody silently vanishes. Half-width katakana is bucketed; leading whitespace / decomposed dakuten fall to 他 (a maintained shadow reading column would be needed to normalise those, deliberately out of scope).
+- **Disable switch.** *Enable kana filtering* (on by default) removes the filters from the participants webservice entirely when off — the surface is gone, not merely hidden.

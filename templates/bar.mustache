@@ -32,7 +32,8 @@
         * chips array - Index buttons in display order:
             * key string - Row key (all, a, ka, ..., la-lz, other).
             * label string - Button text.
-            * active bool - Whether this chip starts pressed.
+            * active bool - Whether this chip starts pressed (drives the active class).
+            * ariapressed string - "true"/"false" for the initial aria-pressed state.
 
     Example context (json):
     {
@@ -42,9 +43,9 @@
                 "filter": "kanalast",
                 "label": "Last name",
                 "chips": [
-                    {"key": "all", "label": "すべて", "active": true},
-                    {"key": "a", "label": "あ", "active": false},
-                    {"key": "other", "label": "他", "active": false}
+                    {"key": "all", "label": "すべて", "active": true, "ariapressed": "true"},
+                    {"key": "a", "label": "あ", "active": false, "ariapressed": "false"},
+                    {"key": "other", "label": "他", "active": false, "ariapressed": "false"}
                 ]
             }
         ]
@@ -55,7 +56,7 @@
         <div class="local-gojuon-barrow d-flex flex-wrap align-items-center mb-1" data-filter="{{filter}}">
             <span class="local-gojuon-barlabel me-2 text-muted">{{label}}</span>
             {{#chips}}
-                <button type="button" class="btn btn-secondary btn-sm local-gojuon-chip{{#active}} active{{/active}}" data-row="{{key}}" data-filter="{{filter}}" aria-pressed="{{active}}">{{label}}</button>
+                <button type="button" class="btn btn-secondary btn-sm local-gojuon-chip{{#active}} active{{/active}}" data-row="{{key}}" data-filter="{{filter}}" aria-pressed="{{ariapressed}}">{{label}}</button>
             {{/chips}}
         </div>
     {{/bars}}
