@@ -30,3 +30,9 @@ Pairs nicely with [theme_lozenge](https://github.com/jethac/moodle-theme_lozenge
 - **Collation.** Matching is a case- and accent-sensitive prefix `LIKE`, so voiced kana never conflate with their base (が ≠ か) regardless of the site's default collation, and the predicate is index-usable.
 - **Completeness.** 他 is the true complement (empty reading, or a leading character in no row), so every participant lands in exactly one bucket — nobody silently vanishes. Half-width katakana is bucketed; leading whitespace / decomposed dakuten fall to 他 (a maintained shadow reading column would be needed to normalise those, deliberately out of scope).
 - **Disable switch.** *Enable kana filtering* (on by default) removes the filters from the participants webservice entirely when off — the surface is gone, not merely hidden.
+
+## Testing
+
+- **PHPUnit** (`tests/`): `kana_test` proves the row model (pairwise-disjoint buckets, dirty-data classification); `participants_test` is DB-backed over generator fixtures — per-row counts, the true-complement 他, the totality invariant (every participant in exactly one bucket), two-axis composition, unknown-value and non-ANY-jointype rejection, the disabled-plugin filter-surface removal, and the visibility gate (an unprivileged viewer cannot filter by a hidden reading).
+- **Behat** (`tests/behat/filter.feature`, `@javascript`): the teacher filter/clear/compose flow, plus a `wcag2aa` axe-core assertion on the bar.
+- **CI**: `.github/workflows/ci.yml` runs `moodle-plugin-ci` (phplint, phpcs, phpdoc, mustache, grunt, phpunit, behat) across PHP 8.2/8.3 × Moodle 4.5/5.2 on PostgreSQL. The `amd/build` files are real grunt output (`grunt amd`), so the grunt conformance check is green.
