@@ -188,6 +188,11 @@ export const init = (config) => {
             return;
         }
 
+        // The hook renders the bar into the page footer (the only injection
+        // point available there); move it directly above the participants
+        // table so it reads as that table's index.
+        root.insertAdjacentElement('beforebegin', bar);
+
         // Tell assistive tech the chips control the participants table.
         if (!root.id) {
             root.id = 'local-gojuon-table';

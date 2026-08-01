@@ -20,12 +20,13 @@
     gap: 4px;
 }
 
-/* Admin option: hide core's Latin A-Z initial-letter bars. Replaces the
-   old inline <style> that the hook used to emit. The body-class + descendant
-   selector out-specifies core's .initialbar rule without !important. */
+/* Admin option: hide core's Latin A-Z initial-letter bars. Core marks those
+   bars with Bootstrap's .d-flex utility (display: flex !important), so
+   !important is required here to win — hence the targeted stylelint waiver. */
 body.local-gojuon-hidelatin .initialbar,
-body.local-gojuon-hidelatin .initialbars {
-    display: none;
+body.local-gojuon-hidelatin .initialbargroups {
+    /* stylelint-disable-next-line declaration-no-important */
+    display: none !important;
 }
 
 /* Visually-hidden live region (Bootstrap 5 dropped .sr-only; define our own). */
