@@ -11,7 +11,7 @@ jobs:
         image: postgres:14
         env:
           POSTGRES_USER: 'postgres'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
+          POSTGRES_PASSWORD: 'postgres'
         ports:
           - 5432:5432
         options: >-
@@ -47,7 +47,9 @@ jobs:
           sudo locale-gen en_AU.UTF-8
 
       - name: Install Moodle + plugin
-        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        run: |
+          moodle-plugin-ci install --plugin ./plugin \
+            --db-host=127.0.0.1 --db-user=postgres --db-pass=postgres --db-name=postgres
         env:
           DB: pgsql
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
