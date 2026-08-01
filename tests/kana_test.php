@@ -25,7 +25,6 @@ namespace local_gojuon;
  * @covers    \local_gojuon\kana
  */
 final class kana_test extends \advanced_testcase {
-
     /**
      * Every candidate character belongs to exactly one row — buckets must
      * not overlap, or a person appears twice and counts stop summing.
@@ -34,8 +33,11 @@ final class kana_test extends \advanced_testcase {
         $seen = [];
         foreach (kana::rows() as $key => $row) {
             // Each row's own set must already be duplicate-free.
-            $this->assertSame(array_values($row['chars']), array_values(array_unique($row['chars'])),
-                "Row '$key' has duplicate characters.");
+            $this->assertSame(
+                array_values($row['chars']),
+                array_values(array_unique($row['chars'])),
+                "Row '$key' has duplicate characters."
+            );
             foreach ($row['chars'] as $char) {
                 if (isset($seen[$char])) {
                     $this->fail("Character '$char' is in both '{$seen[$char]}' and '$key' rows.");
@@ -59,6 +61,8 @@ final class kana_test extends \advanced_testcase {
     }
 
     /**
+     * Reading fixtures for {@see test_first_key}.
+     *
      * @return array<string, array{0: ?string, 1: string}>
      */
     public static function reading_provider(): array {

@@ -54,6 +54,7 @@
 <nav class="local-gojuon-bar mb-3" aria-label="{{arialabel}}">
     {{#bars}}
         <div class="local-gojuon-barrow d-flex flex-wrap align-items-center mb-1" data-filter="{{filter}}"
+             data-region="local-gojuon-{{filter}}"
              role="group" aria-labelledby="{{uniqid}}-label-{{filter}}">
             <span class="local-gojuon-barlabel me-2 text-muted" id="{{uniqid}}-label-{{filter}}">{{label}}</span>
             {{#chips}}

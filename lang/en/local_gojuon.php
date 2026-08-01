@@ -22,14 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Gojūon participants index';
-$string['barlabel'] = 'Filter participants by kana row';
 $string['all'] = 'すべて';
-$string['other'] = '他';
-$string['hidelatin'] = 'Hide A–Z initials bars';
-$string['hidelatin_desc'] = 'Hide the Latin first/last-name initials bars on the participants page, leaving the gojūon index as the only letter navigation.';
-$string['privacy:metadata'] = 'The Gojūon participants index plugin does not store any personal data.';
+$string['announcecleared'] = '{column} filter cleared';
+$string['announcefiltered'] = '{column} filtered by {row}';
+$string['barlabel'] = 'Filter participants by kana row';
 $string['enabled'] = 'Enable kana filtering';
 $string['enabled_desc'] = 'When off, the kana bar is removed and the kanalast/kanafirst filters are rejected at the participants webservice — the filter surface is genuinely gone, not just hidden.';
-$string['announcefiltered'] = '{column} filtered by {row}';
-$string['announcecleared'] = '{column} filter cleared';
+$string['hidelatin'] = 'Hide A–Z initials bars';
+$string['hidelatin_desc'] = 'Hide the Latin first/last-name initials bars on the participants page, leaving the gojūon index as the only letter navigation.';
+$string['other'] = '他';
+$string['pluginname'] = 'Gojūon participants index';
+$string['privacy:metadata'] = 'The Gojūon participants index plugin does not store any personal data.';

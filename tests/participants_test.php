@@ -58,15 +58,19 @@ final class participants_test extends \advanced_testcase {
         $this->context = context_course::instance($this->course->id);
 
         // Reading pairs and the last-row / first-row each should fall into.
+        // Each pair is [lastnamephonetic, firstnamephonetic]: Kato (ka/ta),
+        // Gato (ka voiced/ha), Sato (sa/sa), Sasaki (sa half-width/ya),
+        // Tanaka (ta/ka), Smith (romaji ls/lj), a kanji reading (other/ka),
+        // and an empty reading (other/other).
         $students = [
-            ['かとう', 'たろう'],  // Ka / ta.
-            ['ガトウ', 'はなこ'],  // Ka (voiced katakana) / ha.
-            ['さとう', 'じろう'],  // Sa / sa.
-            ['ｻｻｷ', 'ゆき'],       // Sa (half-width) / ya.
-            ['たなか', 'かなこ'],  // Ta / ka.
-            ['Smith', 'John'],     // Ls / lj (romaji).
-            ['佐藤', 'けん'],      // Other (kanji reading) / ka.
-            ['', ''],              // Other / other (no reading).
+            ['かとう', 'たろう'],
+            ['ガトウ', 'はなこ'],
+            ['さとう', 'じろう'],
+            ['ｻｻｷ', 'ゆき'],
+            ['たなか', 'かなこ'],
+            ['Smith', 'John'],
+            ['佐藤', 'けん'],
+            ['', ''],
         ];
         foreach ($students as [$last, $first]) {
             $u = $gen->create_user([
@@ -109,7 +113,8 @@ final class participants_test extends \advanced_testcase {
     }
 
     public function test_unfiltered_counts_everyone(): void {
-        $this->assertSame(9, $this->count_filtered([])); // 8 students + teacher.
+        // Eight students plus the teacher.
+        $this->assertSame(9, $this->count_filtered([]));
     }
 
     public function test_last_name_rows(): void {
