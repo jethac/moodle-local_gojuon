@@ -65,14 +65,22 @@ class before_footer_html_generation {
             }
 
             // Chips in display order: all, kana rows, Latin A–Z, other.
-            $chips = [['key' => kana::ALL, 'label' => get_string('all', 'local_gojuon')]];
+            // Kana and the すべて/他 labels carry lang="ja" so a screen
+            // reader on a non-Japanese voice pronounces them correctly;
+            // Latin (la–lz) rows get no lang so they read as letters.
+            $chips = [['key' => kana::ALL, 'label' => get_string('all', 'local_gojuon'), 'lang' => 'ja']];
             foreach (kana::rows() as $key => $row) {
-                $chips[] = ['key' => $key, 'label' => $row['label']];
+                $chips[] = [
+                    'key' => $key,
+                    'label' => $row['label'],
+                    'lang' => str_starts_with($key, 'l') ? '' : 'ja',
+                ];
             }
-            $chips[] = ['key' => kana::OTHER, 'label' => get_string('other', 'local_gojuon')];
+            $chips[] = ['key' => kana::OTHER, 'label' => get_string('other', 'local_gojuon'), 'lang' => 'ja'];
 
             // One bar per visible axis. aria-pressed carries string booleans
             // so the server-rendered initial ARIA state is valid.
+            $uniqid = 'gjn' . random_string(8);
             $bars = [];
             foreach (participants::AXES as $filter => $column) {
                 if (!phonetic::viewer_can_see_field($context, $column)) {
@@ -84,12 +92,14 @@ class before_footer_html_generation {
                     $barchips[] = [
                         'key' => $chip['key'],
                         'label' => $chip['label'],
+                        'lang' => $chip['lang'],
                         'filter' => $filter,
                         'active' => $isall,
                         'ariapressed' => $isall ? 'true' : 'false',
                     ];
                 }
                 $bars[] = [
+                    'uniqid' => $uniqid,
                     'filter' => $filter,
                     'label' => $filter === 'kanalast' ? get_string('lastname') : get_string('firstname'),
                     'chips' => $barchips,
@@ -106,9 +116,13 @@ class before_footer_html_generation {
 
             // The hidelatin body class is applied by the module at runtime:
             // add_body_class() cannot run this late (the body tag is out).
+            // The announce templates localise the screen-reader live-region
+            // messages (\{column\}/\{row\} are substituted client-side).
             $PAGE->requires->js_call_amd('local_gojuon/gojuon', 'init', [[
                 'tablecomponent' => 'local_gojuon',
                 'hidelatin' => (bool) get_config('local_gojuon', 'hidelatin'),
+                'announcefiltered' => get_string('announcefiltered', 'local_gojuon'),
+                'announcecleared' => get_string('announcecleared', 'local_gojuon'),
             ]]);
         } catch (\Throwable $e) {
             debugging('local_gojuon: ' . $e->getMessage(), DEBUG_DEVELOPER);

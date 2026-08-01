@@ -30,8 +30,30 @@ import Log from 'core/log';
 
 const SELECTORS = {
     bar: '.local-gojuon-bar',
+    barrow: '.local-gojuon-barrow',
+    barlabel: '.local-gojuon-barlabel',
+    live: '.local-gojuon-live',
     table: '[data-table-component][data-table-handler="participants"]',
     chip: '.local-gojuon-chip',
+};
+
+/**
+ * Announce a message in the polite live region so screen-reader users hear
+ * that the participant list changed after a filter click (core's dynamic
+ * table swaps its content silently). Cleared then set on a tick so repeat
+ * messages re-announce.
+ *
+ * @param {String} message
+ */
+const announce = (message) => {
+    const region = document.querySelector(SELECTORS.live);
+    if (!region) {
+        return;
+    }
+    region.textContent = '';
+    window.setTimeout(() => {
+        region.textContent = message;
+    }, 50);
 };
 
 /**
@@ -100,6 +122,14 @@ const handleChip = (btn, config) => {
 
     Dynamic.setFilters(root, filters).then(() => {
         updateActive(filter, row);
+        // Announce the change: "{column}: {row label}", or the cleared form.
+        const column = btn.closest(SELECTORS.barrow)?.querySelector(SELECTORS.barlabel)?.textContent?.trim() || '';
+        if (row === 'all') {
+            announce((config.announcecleared || '{column}').replace('{column}', column));
+        } else {
+            announce((config.announcefiltered || '{column}: {row}')
+                .replace('{column}', column).replace('{row}', btn.textContent.trim()));
+        }
         return null;
     }).catch((err) => {
         Log.error(`local_gojuon: ${err && err.message ? err.message : err}`);
@@ -157,6 +187,14 @@ export const init = (config) => {
             bar.dataset.gojuonInit = '1';
             return;
         }
+
+        // Tell assistive tech the chips control the participants table.
+        if (!root.id) {
+            root.id = 'local-gojuon-table';
+        }
+        bar.querySelectorAll(SELECTORS.chip).forEach((chip) => {
+            chip.setAttribute('aria-controls', root.id);
+        });
 
         bar.dataset.gojuonInit = '1';
         bar.addEventListener('click', (e) => {

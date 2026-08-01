@@ -26,3 +26,16 @@ body.local-gojuon-hidelatin .initialbar,
 body.local-gojuon-hidelatin .initialbars {
     display: none !important;
 }
+
+/* Visually-hidden live region (Bootstrap 5 dropped .sr-only; define our own). */
+.local-gojuon-live.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

@@ -53,11 +53,15 @@
 }}
 <nav class="local-gojuon-bar mb-3" aria-label="{{arialabel}}">
     {{#bars}}
-        <div class="local-gojuon-barrow d-flex flex-wrap align-items-center mb-1" data-filter="{{filter}}">
-            <span class="local-gojuon-barlabel me-2 text-muted">{{label}}</span>
+        <div class="local-gojuon-barrow d-flex flex-wrap align-items-center mb-1" data-filter="{{filter}}"
+             role="group" aria-labelledby="{{uniqid}}-label-{{filter}}">
+            <span class="local-gojuon-barlabel me-2 text-muted" id="{{uniqid}}-label-{{filter}}">{{label}}</span>
             {{#chips}}
-                <button type="button" class="btn btn-secondary btn-sm local-gojuon-chip{{#active}} active{{/active}}" data-row="{{key}}" data-filter="{{filter}}" aria-pressed="{{ariapressed}}">{{label}}</button>
+                <button type="button" class="btn btn-secondary btn-sm local-gojuon-chip{{#active}} active{{/active}}"
+                        data-row="{{key}}" data-filter="{{filter}}" aria-pressed="{{ariapressed}}"
+                        {{#lang}}lang="{{lang}}" {{/lang}}>{{label}}</button>
             {{/chips}}
         </div>
     {{/bars}}
 </nav>
+<div class="local-gojuon-live sr-only" aria-live="polite" aria-atomic="true"></div>
