@@ -72,10 +72,11 @@ final class participants_test extends \advanced_testcase {
             ]);
             $gen->enrol_user($u->id, $this->course->id, 'student');
         }
-        // Give the teacher a reading so they fall in a definite bucket too.
+        // Teacher reading is in the wa-row, kept out of the rows asserted
+        // below so student counts stay predictable.
         $this->teacher = $gen->create_user([
-            'lastnamephonetic' => 'せんせい',
-            'firstnamephonetic' => 'せんせい',
+            'lastnamephonetic' => 'わたなべ',
+            'firstnamephonetic' => 'わたる',
         ]);
         $gen->enrol_user($this->teacher->id, $this->course->id, 'editingteacher');
 
@@ -134,9 +135,12 @@ final class participants_test extends \advanced_testcase {
         $this->assertSame(0, $this->count_filtered(['kanalast' => 'ka', 'kanafirst' => 'ma']));
     }
 
-    public function test_disabled_plugin_ignores_filters(): void {
+    public function test_disabled_plugin_removes_the_filter_surface(): void {
+        // When disabled, the filterset does not advertise the kana filters,
+        // so the webservice layer rejects them outright.
         set_config('enabled', 0, 'local_gojuon');
-        $this->assertSame(9, $this->count_filtered(['kanalast' => 'ka']));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->count_filtered(['kanalast' => 'ka']);
     }
 
     public function test_unknown_row_is_rejected(): void {
