@@ -12,15 +12,22 @@ Moodle 3.9+ participants tables are *dynamic tables*, addressable by component +
 2. ships a matching filterset accepting an optional `kanarow` string filter alongside every core filter;
 3. injects the bar via the `before_footer_html_generation` hook on `user/index.php` only, re-pointing the page's table at the subclass — all core filtering, sorting, paging and the (optionally hidden) A–Z bars keep working.
 
+Requires Moodle 4.5+ (PHP 8.3+, PostgreSQL 16+ / MariaDB 10.6+). Tested against Moodle 4.5 and 5.2.
+
 ## Install
 
+**From the release ZIP (recommended).** Download the ZIP from the [latest release](https://github.com/jethac/moodle-local_gojuon/releases/latest), then in Moodle go to *Site administration → Plugins → Install plugins*, upload the ZIP, and complete the upgrade. The ZIP already unpacks to the correct `gojuon/` folder, so Moodle detects it as `local_gojuon` automatically. (Do not use GitHub's auto-generated "Source code" ZIP for this — its top folder is named for the tag, which Moodle won't place correctly.)
+
+**Manually.** Unpack into your Moodle tree as `local/gojuon/` (on Moodle 5.x that is `public/local/gojuon/`), then:
+
 ```bash
-cp -r . /path/to/moodle/public/local/gojuon
 php admin/cli/upgrade.php --non-interactive
 php admin/cli/purge_caches.php
 ```
 
-Setting: Site administration → Plugins → Local plugins → Gojūon participants index → *Hide A–Z initials bars*.
+Setting: Site administration → Plugins → Local plugins → Gojūon participants index (*Enable kana filtering*, *Hide A–Z initials bars*).
+
+> Moodle's own Plugins Directory went read-only in mid-2026 ahead of the new Moodle Marketplace, so for now the GitHub release ZIP above is the distribution channel.
 
 Pairs nicely with [theme_lozenge](https://github.com/jethac/moodle-theme_lozenge). GPLv3, like Moodle.
 
