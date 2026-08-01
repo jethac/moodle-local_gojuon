@@ -30,21 +30,21 @@ Feature: Gojūon index bar on the participants page
     Then I should see "Kato"
     And I should see "Sato"
     And I should see "Tanaka"
-    When I click on "か" "button" in the "local-gojuon-kanalast" "region"
+    When I click on "か" "button" in the ".local-gojuon-barrow[data-filter='kanalast']" "css_element"
     Then I should see "Kato"
     And I should not see "Sato"
     And I should not see "Tanaka"
 
   Scenario: Clearing the filter restores the full list
-    When I click on "か" "button" in the "local-gojuon-kanalast" "region"
-    And I click on "すべて" "button" in the "local-gojuon-kanalast" "region"
+    When I click on "か" "button" in the ".local-gojuon-barrow[data-filter='kanalast']" "css_element"
+    And I click on "すべて" "button" in the ".local-gojuon-barrow[data-filter='kanalast']" "css_element"
     Then I should see "Kato"
     And I should see "Sato"
     And I should see "Tanaka"
 
   Scenario: The two axes compose
-    When I click on "た" "button" in the "local-gojuon-kanalast" "region"
-    And I click on "は" "button" in the "local-gojuon-kanafirst" "region"
+    When I click on "た" "button" in the ".local-gojuon-barrow[data-filter='kanalast']" "css_element"
+    And I click on "は" "button" in the ".local-gojuon-barrow[data-filter='kanafirst']" "css_element"
     Then I should see "Tanaka"
     And I should not see "Kato"
 

@@ -28,11 +28,17 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_gojuon', get_string('pluginname', 'local_gojuon'));
     $ADMIN->add('localplugins', $settings);
 
-    $settings->add(new admin_setting_configcheckbox('local_gojuon/enabled',
+    $settings->add(new admin_setting_configcheckbox(
+        'local_gojuon/enabled',
         get_string('enabled', 'local_gojuon'),
-        get_string('enabled_desc', 'local_gojuon'), 1));
+        get_string('enabled_desc', 'local_gojuon'),
+        1
+    ));
 
-    $settings->add(new admin_setting_configcheckbox('local_gojuon/hidelatin',
+    $settings->add(new admin_setting_configcheckbox(
+        'local_gojuon/hidelatin',
         get_string('hidelatin', 'local_gojuon'),
-        get_string('hidelatin_desc', 'local_gojuon'), 0));
+        get_string('hidelatin_desc', 'local_gojuon'),
+        0
+    ));
 }
