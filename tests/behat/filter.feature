@@ -48,6 +48,10 @@ Feature: Gojūon index bar on the participants page
     Then I should see "Tanaka"
     And I should not see "Kato"
 
+  Scenario: The bar renders above the participant list, not buried in the footer
+    Then ".local-gojuon-bar" "css_element" should be visible
+    And ".local-gojuon-bar" "css_element" should appear before "[data-table-component][data-table-handler='participants']" "css_element"
+
   @accessibility
   Scenario: The kana bar meets accessibility standards
     Then the ".local-gojuon-bar" "css_element" should meet "wcag2aa" accessibility standards
