@@ -31,7 +31,6 @@ namespace local_gojuon;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class kana {
-
     /** Row key reserved for readings with no leading kana or Latin letter. */
     const OTHER = 'other';
 
@@ -60,7 +59,7 @@ class kana {
         'ma' => ['label' => 'ま', 'chars' => ['ま', 'み', 'む', 'め', 'も', 'マ', 'ミ', 'ム', 'メ', 'モ']],
         'ya' => ['label' => 'や', 'chars' => ['や', 'ゃ', 'ゆ', 'ゅ', 'よ', 'ょ', 'ヤ', 'ャ', 'ユ', 'ュ', 'ヨ', 'ョ']],
         'ra' => ['label' => 'ら', 'chars' => ['ら', 'り', 'る', 'れ', 'ろ', 'ラ', 'リ', 'ル', 'レ', 'ロ']],
-        // ん (and archaic ゐゑ) traditionally sit with the wa-row tail.
+        // N and the archaic wi/we kana traditionally sit with the wa-row tail.
         'wa' => ['label' => 'わ', 'chars' => ['わ', 'ゎ', 'ゐ', 'ゑ', 'を', 'ん', 'ワ', 'ヮ', 'ヰ', 'ヱ', 'ヲ', 'ン']],
     ];
 
@@ -109,8 +108,8 @@ class kana {
                 'chars' => [
                     $letter,
                     $lower,
-                    mb_chr(0xFF21 + ord($letter) - ord('A'), 'UTF-8'), // Ａ.
-                    mb_chr(0xFF41 + ord($letter) - ord('A'), 'UTF-8'), // ａ.
+                    mb_chr(0xFF21 + ord($letter) - ord('A'), 'UTF-8'), // Full-width uppercase.
+                    mb_chr(0xFF41 + ord($letter) - ord('A'), 'UTF-8'), // Full-width lowercase.
                 ],
             ];
         }

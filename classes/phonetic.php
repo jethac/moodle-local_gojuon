@@ -34,7 +34,6 @@ use context;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class phonetic {
-
     /**
      * The effective full-name format string for the current viewer in a
      * context: the privileged alternative format if the viewer may see it,
@@ -47,9 +46,11 @@ class phonetic {
     protected static function effective_format(context $context): string {
         global $CFG;
         $format = $CFG->fullnamedisplay ?? 'language';
-        if (!empty($CFG->alternativefullnameformat)
-                && $CFG->alternativefullnameformat !== 'language'
-                && has_capability('moodle/site:viewfullnames', $context)) {
+        if (
+            !empty($CFG->alternativefullnameformat)
+            && $CFG->alternativefullnameformat !== 'language'
+            && has_capability('moodle/site:viewfullnames', $context)
+        ) {
             $format = $CFG->alternativefullnameformat;
         }
         if ($format === 'language' || trim($format) === '') {

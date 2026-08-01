@@ -35,7 +35,6 @@ use local_gojuon\phonetic;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class participants extends \core_user\table\participants {
-
     /** @var array<string, string> Filter name => phonetic column. */
     const AXES = [
         'kanalast' => 'lastnamephonetic',

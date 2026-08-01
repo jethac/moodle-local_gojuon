@@ -30,7 +30,6 @@ use core_table\local\filter\string_filter;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class participants_filterset extends \core_user\table\participants_filterset {
-
     /**
      * Optional filters: everything core allows, plus the two kana axes
      * (unless the plugin is disabled).

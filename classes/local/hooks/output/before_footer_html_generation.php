@@ -32,7 +32,6 @@ use local_gojuon\table\participants;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class before_footer_html_generation {
-
     /**
      * Add the bar + module when we're on the course participants page and
      * the viewer may see at least one phonetic name field.

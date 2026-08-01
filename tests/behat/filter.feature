@@ -21,7 +21,7 @@ Feature: Gojūon index bar on the participants page
       | tanaka   | C1     | student        |
       | teacher1 | C1     | editingteacher |
     And the following config values are set as admin:
-      | alternativefullnameformat | lastname firstname lastnamephonetic firstnamephonetic |              |
+      | fullnamedisplay           | lastname firstname lastnamephonetic firstnamephonetic |              |
       | enabled                   | 1                                                     | local_gojuon |
     And I log in as "teacher1"
     And I am on the "Course 1" "enrolled users" page
