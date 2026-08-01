@@ -34,12 +34,13 @@ use local_gojuon\table\participants_filterset;
  * @covers    \local_gojuon\phonetic
  */
 final class participants_test extends \advanced_testcase {
-
     /** @var \stdClass */
     protected $course;
+
     /** @var context_course */
     protected $context;
-    /** @var \stdClass the teacher (can see phonetic names) */
+
+    /** @var \stdClass The teacher, who can see phonetic names. */
     protected $teacher;
 
     protected function setUp(): void {
@@ -47,25 +48,27 @@ final class participants_test extends \advanced_testcase {
         $this->resetAfterTest();
         set_config('enabled', 1, 'local_gojuon');
         // Privileged viewers see phonetic readings; the default format does not.
-        set_config('alternativefullnameformat',
-            'lastname firstname lastnamephonetic firstnamephonetic');
+        set_config(
+            'alternativefullnameformat',
+            'lastname firstname lastnamephonetic firstnamephonetic'
+        );
 
         $gen = $this->getDataGenerator();
         $this->course = $gen->create_course();
         $this->context = context_course::instance($this->course->id);
 
-        // lastnamephonetic / firstnamephonetic -> expected last-row / first-row.
+        // Reading pairs and the last-row / first-row each should fall into.
         $students = [
-            ['かとう', 'たろう'],   // ka / ta
-            ['ガトウ', 'はなこ'],   // ka (voiced katakana) / ha
-            ['さとう', 'じろう'],   // sa / sa
-            ['ｻｻｷ', 'ゆき'],       // sa (half-width) / ya
-            ['たなか', 'かなこ'],   // ta / ka
-            ['Smith', 'John'],     // ls / lj (romaji)
-            ['佐藤', 'けん'],       // other (kanji reading) / ka
-            ['', ''],              // other / other (no reading)
+            ['かとう', 'たろう'],  // Ka / ta.
+            ['ガトウ', 'はなこ'],  // Ka (voiced katakana) / ha.
+            ['さとう', 'じろう'],  // Sa / sa.
+            ['ｻｻｷ', 'ゆき'],       // Sa (half-width) / ya.
+            ['たなか', 'かなこ'],  // Ta / ka.
+            ['Smith', 'John'],     // Ls / lj (romaji).
+            ['佐藤', 'けん'],      // Other (kanji reading) / ka.
+            ['', ''],              // Other / other (no reading).
         ];
-        foreach ($students as $i => [$last, $first]) {
+        foreach ($students as [$last, $first]) {
             $u = $gen->create_user([
                 'lastnamephonetic' => $last,
                 'firstnamephonetic' => $first,
@@ -86,7 +89,7 @@ final class participants_test extends \advanced_testcase {
     /**
      * Count participants matching a set of kana filters.
      *
-     * @param array<string, string> $kana filtername => row key
+     * @param array $kana Map of filter name to row key.
      * @return int
      */
     protected function count_filtered(array $kana): int {
@@ -110,14 +113,18 @@ final class participants_test extends \advanced_testcase {
     }
 
     public function test_last_name_rows(): void {
-        $this->assertSame(2, $this->count_filtered(['kanalast' => 'ka'])); // かとう, ガトウ.
-        $this->assertSame(2, $this->count_filtered(['kanalast' => 'sa'])); // さとう, ｻｻｷ (half-width).
-        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ta'])); // たなか.
-        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ls'])); // Smith.
+        // Ka-row: Kato and Gato (voiced katakana).
+        $this->assertSame(2, $this->count_filtered(['kanalast' => 'ka']));
+        // Sa-row: Sato and Sasaki (half-width katakana).
+        $this->assertSame(2, $this->count_filtered(['kanalast' => 'sa']));
+        // Ta-row: Tanaka.
+        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ta']));
+        // L-row (romaji): Smith.
+        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ls']));
     }
 
     public function test_other_is_the_true_complement(): void {
-        // Kanji reading + empty reading fall to 他; nobody vanishes.
+        // Kanji reading plus empty reading fall to the other bucket.
         $this->assertSame(2, $this->count_filtered(['kanalast' => kana::OTHER]));
     }
 
@@ -126,11 +133,15 @@ final class participants_test extends \advanced_testcase {
         foreach (array_keys(kana::rows()) as $rowkey) {
             $sum += $this->count_filtered(['kanalast' => $rowkey]);
         }
-        $this->assertSame($this->count_filtered([]), $sum, 'Every participant must land in exactly one bucket.');
+        $this->assertSame(
+            $this->count_filtered([]),
+            $sum,
+            'Every participant must land in exactly one bucket.'
+        );
     }
 
     public function test_two_axes_compose(): void {
-        // かとう/たろう is the only ka-last + ta-first participant.
+        // Kato Taro is the only ka-last plus ta-first participant.
         $this->assertSame(1, $this->count_filtered(['kanalast' => 'ka', 'kanafirst' => 'ta']));
         $this->assertSame(0, $this->count_filtered(['kanalast' => 'ka', 'kanafirst' => 'ma']));
     }
@@ -151,8 +162,11 @@ final class participants_test extends \advanced_testcase {
     public function test_non_any_jointype_is_rejected(): void {
         $fs = new participants_filterset();
         $fs->add_filter(new integer_filter('courseid', null, [(int) $this->course->id]));
-        $fs->add_filter(new string_filter('kanalast',
-            \core_table\local\filter\filter::JOINTYPE_NONE, ['ka']));
+        $fs->add_filter(new string_filter(
+            'kanalast',
+            \core_table\local\filter\filter::JOINTYPE_NONE,
+            ['ka']
+        ));
         $table = new participants('t');
         $table->set_filterset($fs);
         $this->expectException(\invalid_parameter_exception::class);
@@ -165,11 +179,17 @@ final class participants_test extends \advanced_testcase {
         $student = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($student->id, $this->course->id, 'student');
         $this->setUser($student);
-        $this->assertSame(10, $this->count_filtered(['kanalast' => 'ka']),
-            'Unprivileged viewer must not be able to filter by a hidden reading.');
+        $this->assertSame(
+            10,
+            $this->count_filtered(['kanalast' => 'ka']),
+            'Unprivileged viewer must not be able to filter by a hidden reading.'
+        );
 
         $this->setUser($this->teacher);
-        $this->assertSame(2, $this->count_filtered(['kanalast' => 'ka']),
-            'Privileged viewer filters normally.');
+        $this->assertSame(
+            2,
+            $this->count_filtered(['kanalast' => 'ka']),
+            'Privileged viewer filters normally.'
+        );
     }
 }
