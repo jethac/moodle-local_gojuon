@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_gojuon';
-$plugin->version   = 2026080200;
+$plugin->version   = 2026080201;
 $plugin->requires  = 2024100700; // Moodle 4.5+ (hook API, dynamic tables).
 $plugin->supported = [405, 502]; // Depends on undocumented core internals.
-$plugin->release   = '1.0.0';
+$plugin->release   = '1.0.1';
 $plugin->maturity  = MATURITY_STABLE;

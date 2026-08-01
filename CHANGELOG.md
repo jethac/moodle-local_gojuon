@@ -4,6 +4,19 @@ All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-08-01
+
+### Fixed
+- The index bar rendered into the page footer instead of above the
+  participants table (a regression from the move to a Mustache template +
+  AMD module); the module now relocates it above the table.
+- The "Hide A–Z initials bars" setting no longer hid core's bars, which are
+  marked with Bootstrap's `.d-flex` (`display: flex !important`); the CSS now
+  wins with `!important` and targets the real `.initialbargroups` container.
+
+### Added
+- Behat coverage asserting the bar renders above the participants table.
+
 ## [1.0.0] - 2026-08-01
 
 First stable release.
