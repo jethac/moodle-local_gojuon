@@ -20,6 +20,25 @@
     gap: 4px;
 }
 
+/* The row's currently-applied filter. Without this the clicked chip is
+   indistinguishable from the rest (btn-secondary's own .active is barely a
+   shade darker). Recolour through Bootstrap 5.3's button custom properties so
+   the selected chip fills with the theme's brand colour and follows the Lozenge
+   accent; aria-pressed carries the state to assistive tech and the heavier
+   weight is a non-colour cue (WCAG 1.4.1). */
+.local-gojuon-bar .local-gojuon-chip.active {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: var(--bs-primary);
+    --bs-btn-hover-border-color: var(--bs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--bs-primary);
+    --bs-btn-active-border-color: var(--bs-primary);
+    --bs-btn-active-color: #fff;
+    font-weight: 600;
+}
+
 /* Admin option: hide core's Latin A-Z initial-letter bars. Core marks those
    bars with Bootstrap's .d-flex utility (display: flex !important), so
    !important is required here to win — hence the targeted stylelint waiver. */

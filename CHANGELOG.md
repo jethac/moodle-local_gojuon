@@ -4,6 +4,14 @@ All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-08-01
+
+### Fixed
+- The chip for the currently-applied filter now shows a clear active state
+  (filled with the theme's brand colour). The active chip was already tracked
+  in markup (`aria-pressed`) and toggled at runtime, but nothing styled it, so
+  the selected kana row was visually indistinguishable from the rest.
+
 ## [1.0.1] - 2026-08-01
 
 ### Fixed
