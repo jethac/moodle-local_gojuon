@@ -88,7 +88,7 @@ final class participants_test extends \advanced_testcase {
      * @param array<string, string> $kana filtername => row key
      * @return int
      */
-    protected function count(array $kana): int {
+    protected function count_filtered(array $kana): int {
         $fs = new participants_filterset();
         $fs->add_filter(new integer_filter('courseid', null, [(int) $this->course->id]));
         foreach ($kana as $name => $val) {
@@ -105,43 +105,43 @@ final class participants_test extends \advanced_testcase {
     }
 
     public function test_unfiltered_counts_everyone(): void {
-        $this->assertSame(9, $this->count([])); // 8 students + teacher.
+        $this->assertSame(9, $this->count_filtered([])); // 8 students + teacher.
     }
 
     public function test_last_name_rows(): void {
-        $this->assertSame(2, $this->count(['kanalast' => 'ka'])); // かとう, ガトウ.
-        $this->assertSame(2, $this->count(['kanalast' => 'sa'])); // さとう, ｻｻｷ (half-width).
-        $this->assertSame(1, $this->count(['kanalast' => 'ta'])); // たなか.
-        $this->assertSame(1, $this->count(['kanalast' => 'ls'])); // Smith.
+        $this->assertSame(2, $this->count_filtered(['kanalast' => 'ka'])); // かとう, ガトウ.
+        $this->assertSame(2, $this->count_filtered(['kanalast' => 'sa'])); // さとう, ｻｻｷ (half-width).
+        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ta'])); // たなか.
+        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ls'])); // Smith.
     }
 
     public function test_other_is_the_true_complement(): void {
         // Kanji reading + empty reading fall to 他; nobody vanishes.
-        $this->assertSame(2, $this->count(['kanalast' => kana::OTHER]));
+        $this->assertSame(2, $this->count_filtered(['kanalast' => kana::OTHER]));
     }
 
     public function test_totality_invariant(): void {
-        $sum = $this->count(['kanalast' => kana::OTHER]);
+        $sum = $this->count_filtered(['kanalast' => kana::OTHER]);
         foreach (array_keys(kana::rows()) as $rowkey) {
-            $sum += $this->count(['kanalast' => $rowkey]);
+            $sum += $this->count_filtered(['kanalast' => $rowkey]);
         }
-        $this->assertSame($this->count([]), $sum, 'Every participant must land in exactly one bucket.');
+        $this->assertSame($this->count_filtered([]), $sum, 'Every participant must land in exactly one bucket.');
     }
 
     public function test_two_axes_compose(): void {
         // かとう/たろう is the only ka-last + ta-first participant.
-        $this->assertSame(1, $this->count(['kanalast' => 'ka', 'kanafirst' => 'ta']));
-        $this->assertSame(0, $this->count(['kanalast' => 'ka', 'kanafirst' => 'ma']));
+        $this->assertSame(1, $this->count_filtered(['kanalast' => 'ka', 'kanafirst' => 'ta']));
+        $this->assertSame(0, $this->count_filtered(['kanalast' => 'ka', 'kanafirst' => 'ma']));
     }
 
     public function test_disabled_plugin_ignores_filters(): void {
         set_config('enabled', 0, 'local_gojuon');
-        $this->assertSame(9, $this->count(['kanalast' => 'ka']));
+        $this->assertSame(9, $this->count_filtered(['kanalast' => 'ka']));
     }
 
     public function test_unknown_row_is_rejected(): void {
         $this->expectException(\invalid_parameter_exception::class);
-        $this->count(['kanalast' => 'zzz']);
+        $this->count_filtered(['kanalast' => 'zzz']);
     }
 
     public function test_non_any_jointype_is_rejected(): void {
@@ -161,11 +161,11 @@ final class participants_test extends \advanced_testcase {
         $student = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($student->id, $this->course->id, 'student');
         $this->setUser($student);
-        $this->assertSame(10, $this->count(['kanalast' => 'ka']),
+        $this->assertSame(10, $this->count_filtered(['kanalast' => 'ka']),
             'Unprivileged viewer must not be able to filter by a hidden reading.');
 
         $this->setUser($this->teacher);
-        $this->assertSame(2, $this->count(['kanalast' => 'ka']),
+        $this->assertSame(2, $this->count_filtered(['kanalast' => 'ka']),
             'Privileged viewer filters normally.');
     }
 }
