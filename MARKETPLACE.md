@@ -48,15 +48,23 @@ Admin tools (or: Course / participants).
 
 GNU GPL v3 or later.
 
+The release ZIP includes `COPYING.txt`.
+
+## Translations
+
+The plugin ships English strings only. Japanese translations should be submitted
+through AMOS after the plugin is approved and registered.
+
 ## Repository / tracker / documentation
 
 - Source: https://github.com/jethac/moodle-local_gojuon
 - Issues: https://github.com/jethac/moodle-local_gojuon/issues
 - Documentation: the repository README.
 
-## Screenshots to capture (not yet included)
+## Screenshots for the listing
 
-1. The participants page of a Japanese-language course showing both the 姓 and
-   名 bars above the list, with A–Z hidden.
-2. The list filtered to one kana row (e.g. か), showing only matching students.
-3. The admin settings page.
+1. `screenshots/participants-bars.png` — the participants page of a Japanese-
+   language course showing both the 姓 and 名 bars above the list, with A–Z hidden.
+2. `screenshots/participants-filter-ka.png` — the list filtered to か, showing
+   only matching students.
+3. `screenshots/admin-settings.png` — the admin settings page.
