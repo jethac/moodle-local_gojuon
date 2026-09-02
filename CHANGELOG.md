@@ -4,6 +4,12 @@ All notable changes to this plugin are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2026-09-02
+
+### Changed
+- Prepared the Marketplace submission package with bundled GPL v3 licence text,
+  listing screenshots, and English-only plugin strings for AMOS translation.
+
 ## [1.0.2] - 2026-08-01
 
 ### Fixed
