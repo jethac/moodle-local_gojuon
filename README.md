@@ -44,6 +44,26 @@ Pairs nicely with [theme_lozenge](https://github.com/jethac/moodle-theme_lozenge
 - **Behat** (`tests/behat/filter.feature`, `@javascript`): the teacher filter/clear/compose flow, plus a `wcag2aa` axe-core assertion on the bar.
 - **CI**: `.github/workflows/ci.yml` runs `moodle-plugin-ci` (phplint, phpmd, phpcs, phpdoc, validate, mustache, grunt, phpunit, behat) across PHP 8.3 × Moodle 4.5/5.2 on PostgreSQL 16 — all green. The `amd/build` files are real grunt output (`grunt amd`), so the grunt conformance check passes.
 
+## Reviewer/demo data
+
+For manual review or local screenshots, the repository includes an idempotent
+fixture script that creates a course with Japanese participant data:
+
+```bash
+php local/gojuon/tools/seed_japanese_participants.php
+```
+
+On Moodle 5.x checkouts using a `public/` webroot, run:
+
+```bash
+php public/local/gojuon/tools/seed_japanese_participants.php
+```
+
+The script creates or reuses course shortname `GOJUON-JA-FIXTURES`, creates
+ten `gojuon.*` users with kana, katakana, romaji, and blank phonetic readings,
+enrols them as students, and enables the plugin's demo settings. Use
+`--help` for custom course names or `--no-plugin-config`.
+
 ## Author
 
 Jetha Chan — [jethachan.net](https://jethachan.net) · [@jetha on X](https://x.com/jetha) · [jethachan@gmail.com](mailto:jethachan@gmail.com)
