@@ -24,7 +24,6 @@ use local_gojuon\local\japanese_participant_seed;
  * @package   local_gojuon
  * @copyright 2026 Jetha Chan
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers    \local_gojuon\local\japanese_participant_seed
  */
 final class seed_japanese_participants_test extends \advanced_testcase {
     public function test_fixtures_cover_representative_japanese_name_data(): void {
